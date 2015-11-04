@@ -1,0 +1,3 @@
+rootProject.name = 'parent-all'
+include 'core'
+

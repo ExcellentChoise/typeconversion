@@ -1,0 +1,34 @@
+group 'io.excellentchoise.typeconversion'
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'checkstyle'
+
+    version '0.1-SNAPSHOT'
+
+    checkstyle {
+        configFile = rootProject.file('code-quality/checkstyle.xml')
+        toolVersion = "6.11.2"
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: '4.11'
+        testCompile group: 'org.assertj', name: 'assertj-core', version: '3.2.0'
+        testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.7'
+}
+
