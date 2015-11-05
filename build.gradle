@@ -8,6 +8,7 @@ subprojects {
 
     checkstyle {
         configFile = rootProject.file('code-quality/checkstyle.xml')
+        sourceSets = [ sourceSets.main ]
         toolVersion = "6.11.2"
     }
 
