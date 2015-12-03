@@ -21,4 +21,18 @@ public final class Conversions {
     public static <Source, Result> DirectConversion<Result, Source> asDirect(ReverseConversion<Result, Source> reverse) {
         return reverse::revert;
     }
+
+    /**
+     * Create a builder for {@link TypeSwitchingConversion} used to convert arbitrary objects based on the type of Source argument.
+     * @param sourceClass class of Source
+     * @param resultClass class of Result
+     * @param <Source> type to be converted
+     * @param <Result> type of the conversion result
+     * @return a builder for {@link TypeSwitchingConversion}
+     */
+    @SuppressWarnings("unused")
+    public static <Source, Result> TypeSwitchingConversion.Builder<Source, Result> typeSwitch(
+            Class<Source> sourceClass, Class<Result> resultClass) {
+        return TypeSwitchingConversion.newBuilder();
+    }
 }
