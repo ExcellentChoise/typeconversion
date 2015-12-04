@@ -18,17 +18,17 @@ public class BijectionsTest {
 
     @Test
     public void whenBijectionGotCreatedByTwoFunctions_it_shouldUseThemAsInterfaceMethodsImplementation() {
-        Bijection<String, String> mapping = Bijection.from(any -> "test", test -> "passed");
+        Bijection<String, String> bijection = Bijection.from(any -> "test", test -> "passed");
 
-        assertThat(mapping.convert("anything")).isEqualTo("test");
-        assertThat(mapping.revert("anything")).isEqualTo("passed");
+        assertThat(bijection.convert("anything")).isEqualTo("test");
+        assertThat(bijection.revert("anything")).isEqualTo("passed");
     }
 
     @Test
     public void whenAnyBijectionGiven_reversed_shouldReturnBijectionFromResultToSource() {
-        Bijection<String, Integer> mapping = Bijection.from(any -> 5, five -> "any");
+        Bijection<String, Integer> bijection = Bijection.from(any -> 5, five -> "any");
 
-        Bijection<Integer, String> inverse = mapping.reversed();
+        Bijection<Integer, String> inverse = bijection.reversed();
 
         assertThat(inverse.convert(5)).isEqualTo("any");
         assertThat(inverse.revert("any")).isEqualTo(5);
@@ -36,23 +36,23 @@ public class BijectionsTest {
 
     @Test
     public void whenTwoConnectableBijectionsGiven_then_shouldConstructChainFromThem() {
-        Bijection<Integer, String> firstMapping = Bijection.from(number -> "test", str -> 5);
-        Bijection<String, Long> secondMapping = Bijection.from(str -> 10L, longNumber -> "test");
+        Bijection<Integer, String> firstBijection = Bijection.from(number -> "test", str -> 5);
+        Bijection<String, Long> secondBijection = Bijection.from(str -> 10L, longNumber -> "test");
 
-        Bijection<Integer, Long> chainMapping = firstMapping.then(secondMapping);
+        Bijection<Integer, Long> chainBijection = firstBijection.then(secondBijection);
 
-        assertThat(chainMapping.convert(100)).isEqualTo(10L);
-        assertThat(chainMapping.revert(10L)).isEqualTo(5);
+        assertThat(chainBijection.convert(100)).isEqualTo(10L);
+        assertThat(chainBijection.revert(10L)).isEqualTo(5);
     }
 
     @Test
     public void whenConnectableInjectionAndBijectionGiven_then_shouldConstructInjectionFromThem() {
-        Bijection<Integer, String> firstMapping = Bijection.from(number -> "test", str -> 5);
-        Injection<String, Long> secondMapping = Injection.from(str -> 10L, longNumber -> Optional.of("test"));
+        Bijection<Integer, String> firstBijection = Bijection.from(number -> "test", str -> 5);
+        Injection<String, Long> secondBijection = Injection.from(str -> 10L, longNumber -> Optional.of("test"));
 
-        Injection<Integer, Long> chainMapping = firstMapping.then(secondMapping);
+        Injection<Integer, Long> chainBijection = firstBijection.then(secondBijection);
 
-        assertThat(chainMapping.convert(100)).isEqualTo(10L);
-        assertThat(chainMapping.revert(10L)).contains(5);
+        assertThat(chainBijection.convert(100)).isEqualTo(10L);
+        assertThat(chainBijection.revert(10L)).contains(5);
     }
 }

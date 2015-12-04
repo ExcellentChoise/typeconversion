@@ -10,7 +10,7 @@ import java.util.Optional;
  * @param <Result> type of the conversion result
  */
 public interface Injection<Source, Result>
-        extends DirectConversion<Source, Result>, ReverseConversion<Result, Optional<Source>> {
+        extends Conversion<Source, Result>, ReverseConversion<Result, Optional<Source>> {
     /**
      * Creates injection using two functions for direct/reverse conversion.
      * @param direct function for direct conversion of the source type to result
@@ -20,7 +20,7 @@ public interface Injection<Source, Result>
      * @return injection which uses the given functions for conversion operations
      */
     static <Source, Result> Injection<Source, Result> from(
-            DirectConversion<Source, Result> direct, ReverseConversion<Result, Optional<Source>> reverse) {
+            Conversion<Source, Result> direct, ReverseConversion<Result, Optional<Source>> reverse) {
         return new Injection<Source, Result>() {
             @Override
             public Result convert(Source source) {
@@ -28,8 +28,8 @@ public interface Injection<Source, Result>
             }
 
             @Override
-            public Optional<Source> revert(Result source) {
-                return reverse.revert(source);
+            public Optional<Source> revert(Result result) {
+                return reverse.revert(result);
             }
         };
     }

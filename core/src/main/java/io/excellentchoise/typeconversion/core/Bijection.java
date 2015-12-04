@@ -2,11 +2,11 @@ package io.excellentchoise.typeconversion.core;
 
 /**
  * Interface for one-to-one correspondence between two types.
- * @param <Source> source of the mapping which can be recovered from the result
- * @param <Result> result of the mapping
+ * @param <Source> source of the bijection which can be recovered from the result
+ * @param <Result> result of the bijection
  */
 public interface Bijection<Source, Result>
-        extends DirectConversion<Source, Result>, ReverseConversion<Result, Source> {
+        extends Conversion<Source, Result>, ReverseConversion<Result, Source> {
     /**
      * Creates bijection using two functions for direct/reverse conversion.
      * @param direct function for direct conversion of the source type to result
@@ -16,7 +16,7 @@ public interface Bijection<Source, Result>
      * @return bijection which uses the given functions for conversion operations
      */
     static <Source, Result> Bijection<Source, Result> from(
-            DirectConversion<Source, Result> direct, ReverseConversion<Result, Source> reverse) {
+            Conversion<Source, Result> direct, ReverseConversion<Result, Source> reverse) {
         return new Bijection<Source, Result>() {
             @Override
             public Result convert(Source source) {
@@ -24,8 +24,8 @@ public interface Bijection<Source, Result>
             }
 
             @Override
-            public Source revert(Result source) {
-                return reverse.revert(source);
+            public Source revert(Result result) {
+                return reverse.revert(result);
             }
         };
     }

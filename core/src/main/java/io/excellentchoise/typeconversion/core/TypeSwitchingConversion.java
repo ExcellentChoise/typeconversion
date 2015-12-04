@@ -13,13 +13,13 @@ import java.util.*;
  * @param <Result> type of the conversion result
  */
 @SuppressWarnings("unchecked")
-public class TypeSwitchingConversion<Source, Result> implements DirectConversion<Source, Result> {
-    private final Map<Class, DirectConversion<Source, Result>> conversionsByClasses;
-    private final DirectConversion<Source, Result> defaultConversion;
+public class TypeSwitchingConversion<Source, Result> implements Conversion<Source, Result> {
+    private final Map<Class, Conversion<Source, Result>> conversionsByClasses;
+    private final Conversion<Source, Result> defaultConversion;
 
     private TypeSwitchingConversion(
-            Map<Class, DirectConversion<Source, Result>> conversionsByClasses,
-            DirectConversion<Source, Result> defaultConversion) {
+            Map<Class, Conversion<Source, Result>> conversionsByClasses,
+            Conversion<Source, Result> defaultConversion) {
         this.conversionsByClasses = conversionsByClasses;
         this.defaultConversion = defaultConversion;
     }
@@ -36,24 +36,24 @@ public class TypeSwitchingConversion<Source, Result> implements DirectConversion
 
     @Override
     public Result convert(Source source) {
-        DirectConversion<Source, Result> conversion = getConversion(source);
+        Conversion<Source, Result> conversion = getConversion(source);
         return conversion.convert(source);
     }
 
-    private DirectConversion<Source, Result> getConversion(Source source) {
+    private Conversion<Source, Result> getConversion(Source source) {
         if (source == null) {
             return defaultConversion;
         } else {
-            DirectConversion<Source, Result> conversion = getConversionRecursive(Collections.singletonList(source.getClass()));
+            Conversion<Source, Result> conversion = getConversionRecursive(Collections.singletonList(source.getClass()));
             return conversion != null ? conversion : defaultConversion;
         }
     }
 
-    private DirectConversion<Source, Result> getConversionRecursive(List<Class> classesToCheck) {
+    private Conversion<Source, Result> getConversionRecursive(List<Class> classesToCheck) {
         List<Class> highLevelClasses = new ArrayList<>();
 
         for (Class clazz : classesToCheck) {
-            DirectConversion<Source, Result> conversion = conversionsByClasses.get(clazz);
+            Conversion<Source, Result> conversion = conversionsByClasses.get(clazz);
             if (conversion != null) {
                 return conversion;
             } else {
@@ -75,8 +75,8 @@ public class TypeSwitchingConversion<Source, Result> implements DirectConversion
      * @param <Result> type of the conversion result
      */
     public static class Builder<Source, Result> {
-        private final Map<Class, DirectConversion<Source, Result>> conversionsByClasses;
-        private DirectConversion<Source, Result> defaultConversion;
+        private final Map<Class, Conversion<Source, Result>> conversionsByClasses;
+        private Conversion<Source, Result> defaultConversion;
         private boolean preserveNulls;
 
         private Builder() {
@@ -94,11 +94,11 @@ public class TypeSwitchingConversion<Source, Result> implements DirectConversion
          * @return this instance
          */
         public <TSpecialCase extends Source> Builder<Source, Result> forType(
-                Class<? extends TSpecialCase> sourceSpecialCase, DirectConversion<TSpecialCase, Result> conversion) {
+                Class<? extends TSpecialCase> sourceSpecialCase, Conversion<TSpecialCase, Result> conversion) {
             Objects.requireNonNull(sourceSpecialCase);
             Objects.requireNonNull(conversion);
 
-            conversionsByClasses.put(sourceSpecialCase, (DirectConversion<Source, Result>) conversion);
+            conversionsByClasses.put(sourceSpecialCase, (Conversion<Source, Result>) conversion);
 
             return this;
         }
@@ -109,7 +109,7 @@ public class TypeSwitchingConversion<Source, Result> implements DirectConversion
          * @param defaultConversion general-purpose conversion from Source to Result
          * @return this instance
          */
-        public Builder<Source, Result> defaultingTo(DirectConversion<Source, Result> defaultConversion) {
+        public Builder<Source, Result> defaultingTo(Conversion<Source, Result> defaultConversion) {
             this.defaultConversion = Objects.requireNonNull(defaultConversion);
             return this;
         }
@@ -127,8 +127,8 @@ public class TypeSwitchingConversion<Source, Result> implements DirectConversion
          * Build a {@link TypeSwitchingConversion} based on the given configuration.
          * @return initialized type-switch conversion
          */
-        public DirectConversion<Source, Result> build() {
-            DirectConversion<Source, Result> wrappedDefault = preserveNulls
+        public Conversion<Source, Result> build() {
+            Conversion<Source, Result> wrappedDefault = preserveNulls
                     ? (x -> x != null ? defaultConversion.convert(x) : null)
                     : defaultConversion;
 
