@@ -51,4 +51,9 @@ public class ConversionsTest {
         List<String> object = new ArrayList<>();
         assertThat(Conversions.identity().convert(object)).isSameAs(object);
     }
+
+    @Test
+    public void whenAnyObjectGiven_constantConversion_shouldReturnTheConfiguredObject() {
+        assertThat(Conversions.constant("5").convert("any object")).isEqualTo("5");
+    }
 }

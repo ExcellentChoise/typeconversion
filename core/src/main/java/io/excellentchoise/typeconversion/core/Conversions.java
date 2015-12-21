@@ -21,6 +21,17 @@ public final class Conversions {
     }
 
     /**
+     * Create conversion that will map all values to the single provided result.
+     * @param result single result of the conversion
+     * @param <Source> type to be converted
+     * @param <Result> type of the conversion result
+     * @return constant conversion
+     */
+    public static <Source, Result> Conversion<Source, Result> constant(Result result) {
+        return source -> result;
+    }
+
+    /**
      * Create a builder for {@link TypeSwitchingConversion} used to convert arbitrary objects based on the type of Source argument.
      * @param sourceClass class of Source
      * @param resultClass class of Result
