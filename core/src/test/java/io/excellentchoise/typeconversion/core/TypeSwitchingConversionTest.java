@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class TypeSwitchingConversionTest {
     @Test
@@ -67,11 +68,11 @@ public class TypeSwitchingConversionTest {
         assertThat(resultOfDefaultConversion).isEqualTo(5);
     }
 
-    @Test(expected = ConversionFailedException.class)
+    @Test
     public void whenThereIsNoSuitableConversionForTheConcreteType_andDefaultIsNotConfigured_typeSwitch_shouldThrowException() {
         Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(Object.class, Integer.class).build();
 
-        Integer resultOfDefaultConversion = typeSwitch.convert("any string");
+        assertThatThrownBy(() -> typeSwitch.convert("any string")).isInstanceOf(ConversionFailedException.class);
     }
 
     @Test

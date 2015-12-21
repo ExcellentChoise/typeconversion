@@ -3,6 +3,7 @@ package io.excellentchoise.typeconversion.core;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ConversionThroughConstructorTest {
     @Test
@@ -14,16 +15,17 @@ public class ConversionThroughConstructorTest {
         assertThat(result).isNotNull();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void whenResultDoesntHaveConstructorBySource_conversion_shouldThrowExceptionFromItsConstructor() {
-        ConversionThroughConstructor<Exception, Tester> conversion = new ConversionThroughConstructor<>(Exception.class, Tester.class);
+        assertThatThrownBy(() -> new ConversionThroughConstructor<>(Exception.class, Tester.class))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Test(expected = ConversionFailedException.class)
+    @Test
     public void whenExceptionInConstructorOfResultOccurs_conversion_shouldWrapItAndRethrow() {
         ConversionThroughConstructor<Integer, Tester> conversion = new ConversionThroughConstructor<>(Integer.class, Tester.class);
 
-        Tester result = conversion.convert(5);
+        assertThatThrownBy(() -> conversion.convert(5)).isInstanceOf(ConversionFailedException.class);
     }
 
     private static class Tester {
