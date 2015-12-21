@@ -57,4 +57,28 @@ public final class Conversions {
     public static <Source, Result> DirectCorrespondence.Builder<Source, Result> newCorrespondence() {
         return new DirectCorrespondence.Builder<>();
     }
+
+    /**
+     * Create bijection from key-value pairs of the given map.
+     * @param mapping key-value mapping
+     * @param <Source> type to be converted
+     * @param <Result> type of the conversion result
+     * @return bijection which uses the given map to do key-to-value and value-to-key mappings
+     */
+    public static <Source, Result> Bijection<Source, Result> fromBijectiveMap(Map<Source, Result> mapping) {
+        BijectiveCorrespondence.Builder<Source, Result> builder = newBijectiveCorrespondence();
+        mapping.forEach(builder::add);
+
+        return builder.build();
+    }
+
+    /**
+     * Create a builder for {@link BijectiveCorrespondence} used to bijectively map some instances to another ones.
+     * @param <Source> type to be converted
+     * @param <Result> type of the conversion result
+     * @return bijection between configured instances
+     */
+    public static <Source, Result> BijectiveCorrespondence.Builder<Source, Result> newBijectiveCorrespondence() {
+        return new BijectiveCorrespondence.Builder<>();
+    }
 }
