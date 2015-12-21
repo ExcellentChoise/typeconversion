@@ -1,5 +1,7 @@
 package io.excellentchoise.typeconversion.core;
 
+import java.util.Map;
+
 /**
  * Bijection between instances the given types.
  * @param <Source> type to be converted
@@ -42,6 +44,23 @@ public class BijectiveCorrespondence<Source, Result> implements Bijection<Source
         public BijectiveCorrespondence.Builder<Source, Result> add(Source source, Result result) {
             directMap.add(source, result);
             reverseMap.add(result, source);
+
+            return this;
+        }
+
+        /**
+         * Add all elements of the given map to the building correspondence.
+         * @param mapping bijective mapping from source to result
+         * @return this instance
+         */
+        public Builder<Source, Result> addAll(Map<Source, Result> mapping) {
+            if (mapping.keySet().stream().anyMatch(directMap::isAlreadyRegistered)) {
+                throw new IllegalArgumentException("There is already registered direct conversion for the given argument.");
+            }
+            if (mapping.values().stream().anyMatch(reverseMap::isAlreadyRegistered)) {
+                throw new IllegalArgumentException("There is already registered reverse conversion for the given argument.");
+            }
+            mapping.forEach(this::add);
 
             return this;
         }

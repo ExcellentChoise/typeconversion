@@ -39,12 +39,26 @@ public class DirectCorrespondence<Source, Result> implements Conversion<Source, 
          * @param result conversion result which will be used as value corresponding to the given source
          * @return this instance
          */
-        public DirectCorrespondence.Builder<Source, Result> add(Source source, Result result) {
-            if (directMap.containsKey(source)) {
+        public Builder<Source, Result> add(Source source, Result result) {
+            if (isAlreadyRegistered(source)) {
                 throw new IllegalArgumentException("There is already registered direct conversion for the given argument.");
             }
 
             directMap.put(source, result);
+
+            return this;
+        }
+
+        /**
+         * Add all elements of the given map to the building correspondence.
+         * @param mapping mapping from source to result
+         * @return this instance
+         */
+        public Builder<Source, Result> addAll(Map<Source, Result> mapping) {
+            if (mapping.keySet().stream().anyMatch(this::isAlreadyRegistered)) {
+                throw new IllegalArgumentException("There is already registered direct conversion for the given argument.");
+            }
+            mapping.forEach(this::add);
 
             return this;
         }
@@ -55,6 +69,15 @@ public class DirectCorrespondence<Source, Result> implements Conversion<Source, 
          */
         public Conversion<Source, Result> build() {
             return new DirectCorrespondence<>(directMap);
+        }
+
+        /**
+         * Check if there is already a correspondence for the given source.
+         * @param source key to check
+         * @return true if there is already a correspondence for the given key.
+         */
+        protected boolean isAlreadyRegistered(Source source) {
+            return directMap.containsKey(source);
         }
     }
 }

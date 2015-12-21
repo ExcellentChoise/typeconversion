@@ -4,16 +4,19 @@ import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class DirectCorrespondenceTest {
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void whenMultipleValuesForTheSameKeyGotRegistered_builder_shouldThrowException() {
-        Conversion<String, String> conversion = Conversions.<String, String>newCorrespondence()
+        assertThatThrownBy(() -> Conversions.<String, String>newCorrespondence()
                 .add("test", "passed")
                 .add("test", "failed")
-                .build();
+                .build()
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -37,10 +40,28 @@ public class DirectCorrespondenceTest {
         assertThat(result).isEqualTo("passed");
     }
 
-    @Test(expected = ConversionFailedException.class)
+    @Test
     public void whenCorrespondenceWasNotRegisteredForTheGivenKey_convert_shouldThrowException() {
         Conversion<String, String> conversion = Conversions.<String, String>newCorrespondence().build();
 
-        String result = conversion.convert("test");
+        assertThatThrownBy(() -> conversion.convert("test")).isInstanceOf(ConversionFailedException.class);
+    }
+
+    @Test
+    public void whenAllElementsFromMapGotAddedToTheBuilder_andSomeElementsAlreadyExist_addAll_shouldThrowExceptionAndNotModifyBuildingObject() {
+        DirectCorrespondence.Builder<String, String> builder = Conversions.<String, String>newCorrespondence()
+                .add("c", "d");
+
+        assertThatThrownBy(() ->
+            builder.addAll(new HashMap<String, String>() {{
+                put("a", "b");
+                put("e", "f");
+                put("c", "d");
+            }})
+        ).isInstanceOf(IllegalArgumentException.class);
+
+        Conversion<String, String> conversion = builder.build();
+
+        assertThatThrownBy(() -> conversion.convert("a")).isInstanceOf(ConversionFailedException.class);
     }
 }

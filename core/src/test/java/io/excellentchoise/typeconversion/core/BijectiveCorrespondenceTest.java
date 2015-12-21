@@ -4,24 +4,28 @@ import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class BijectiveCorrespondenceTest {
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void whenMultipleValuesForTheSameKeyGotRegistered_builder_shouldThrowException() {
-        Bijection<String, String> bijection = Conversions.<String, String>newBijectiveCorrespondence()
+        assertThatThrownBy(() -> Conversions.<String, String>newBijectiveCorrespondence()
                 .add("test", "passed")
                 .add("test", "failed")
-                .build();
+                .build()
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void whenSameValuesGotRegistered_builder_shouldThrowException() {
-        Bijection<String, String> bijection = Conversions.<String, String>newBijectiveCorrespondence()
+        assertThatThrownBy(() -> Conversions.<String, String>newBijectiveCorrespondence()
                 .add("test", "passed")
                 .add("suite", "passed")
-                .build();
+                .build()
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -59,17 +63,42 @@ public class BijectiveCorrespondenceTest {
         assertThat(source).isEqualTo("test");
     }
 
-    @Test(expected = ConversionFailedException.class)
+    @Test
     public void whenCorrespondenceWasNotRegisteredForTheGivenKey_convert_shouldThrowException() {
         Bijection<String, String> bijection = Conversions.<String, String>newBijectiveCorrespondence().build();
 
-        String result = bijection.convert("test");
+        assertThatThrownBy(() -> bijection.convert("test")).isInstanceOf(ConversionFailedException.class);
     }
 
-    @Test(expected = ConversionFailedException.class)
+    @Test
     public void whenCorrespondenceWasNotRegisteredForTheGivenValue_revert_shouldThrowException() {
         Bijection<String, String> bijection = Conversions.<String, String>newBijectiveCorrespondence().build();
 
-        String result = bijection.revert("test");
+        assertThatThrownBy(() -> bijection.revert("test")).isInstanceOf(ConversionFailedException.class);
+    }
+
+    @Test
+    public void whenAllElementsFromMapGotAddedToTheBuilder_andSomeElementsAlreadyExist_addAll_shouldThrowExceptionAndNotModifyBuildingObject() {
+        BijectiveCorrespondence.Builder<String, String> builder = Conversions.<String, String>newBijectiveCorrespondence()
+                .add("c", "d");
+
+        assertThatThrownBy(() ->
+            builder.addAll(new HashMap<String, String>() {{
+                put("a", "b");
+                put("c", "d");
+            }})
+        ).isInstanceOf(IllegalArgumentException.class);
+
+        assertThatThrownBy(() ->
+            builder.addAll(new HashMap<String, String>() {{
+                put("x", "y");
+                put("e", "d");
+            }})
+        ).isInstanceOf(IllegalArgumentException.class);
+
+        Bijection<String, String> bijection = builder.build();
+
+        assertThatThrownBy(() -> bijection.convert("a")).isInstanceOf(ConversionFailedException.class);
+        assertThatThrownBy(() -> bijection.revert("y")).isInstanceOf(ConversionFailedException.class);
     }
 }

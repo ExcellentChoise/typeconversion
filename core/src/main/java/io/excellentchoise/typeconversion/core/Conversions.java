@@ -42,10 +42,7 @@ public final class Conversions {
      * @return conversion which uses the given map to resolve value for key
      */
     public static <Source, Result> Conversion<Source, Result> fromMap(Map<Source, Result> mapping) {
-        DirectCorrespondence.Builder<Source, Result> builder = newCorrespondence();
-        mapping.forEach(builder::add);
-
-        return builder.build();
+        return Conversions.<Source, Result>newCorrespondence().addAll(mapping).build();
     }
 
     /**
@@ -66,10 +63,7 @@ public final class Conversions {
      * @return bijection which uses the given map to do key-to-value and value-to-key mappings
      */
     public static <Source, Result> Bijection<Source, Result> fromBijectiveMap(Map<Source, Result> mapping) {
-        BijectiveCorrespondence.Builder<Source, Result> builder = newBijectiveCorrespondence();
-        mapping.forEach(builder::add);
-
-        return builder.build();
+        return Conversions.<Source, Result>newBijectiveCorrespondence().addAll(mapping).build();
     }
 
     /**
