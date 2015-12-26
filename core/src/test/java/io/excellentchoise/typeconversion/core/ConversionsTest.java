@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ConversionsTest {
     @Test
@@ -55,5 +56,19 @@ public class ConversionsTest {
     @Test
     public void whenAnyObjectGiven_constantConversion_shouldReturnTheConfiguredObject() {
         assertThat(Conversions.constant("5").convert("any object")).isEqualTo("5");
+    }
+
+    @Test
+    public void whenAnyObjectGiven_throwingConversion_shouldThrowExceptionWithTheGivenMessage() {
+        assertThatThrownBy(() -> Conversions.throwing("test").convert(5))
+                .isInstanceOf(ConversionFailedException.class)
+                .withFailMessage("test");
+    }
+
+    @Test
+    public void whenAnyObjectGiven_throwingConversion_shouldThrowExceptionWithMessageConstructedByTheGivenFunction() {
+        assertThatThrownBy(() -> Conversions.throwing(src -> "test " + src).convert(10))
+                .isInstanceOf(ConversionFailedException.class)
+                .withFailMessage("test 10");
     }
 }

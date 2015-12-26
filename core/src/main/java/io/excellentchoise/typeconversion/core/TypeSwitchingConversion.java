@@ -81,9 +81,7 @@ public class TypeSwitchingConversion<Source, Result> implements Conversion<Sourc
 
         private Builder() {
             this.conversionsByClasses = new HashMap<>();
-            this.defaultConversion = source -> {
-                throw new ConversionFailedException("Failed to find specific conversion for type " + source.getClass());
-            };
+            this.defaultConversion = Conversions.throwing(source -> "Failed to find specific conversion for type " + source.getClass());
         }
 
         /**

@@ -1,6 +1,7 @@
 package io.excellentchoise.typeconversion.core;
 
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Class containing static methods for various general-purpose conversions creation.
@@ -29,6 +30,28 @@ public final class Conversions {
      */
     public static <Source, Result> Conversion<Source, Result> constant(Result result) {
         return source -> result;
+    }
+
+    /**
+     * Create conversion which always throws exception with the given message.
+     * @param message exception message
+     * @param <Source> type to be converted
+     * @param <Result> type of the conversion result
+     * @return exception throwing conversion
+     */
+    public static <Source, Result> Conversion<Source, Result> throwing(String message) {
+        return throwing(source -> message);
+    }
+
+    /**
+     * Create conversion which always throws exception with message created by the given function.
+     * @param messageMaker exception message creator (dependent on source)
+     * @param <Source> type to be converted
+     * @param <Result> type of the conversion result
+     * @return exception throwing conversion
+     */
+    public static <Source, Result> Conversion<Source, Result> throwing(Function<Source, String> messageMaker) {
+        return (source) -> { throw new ConversionFailedException(messageMaker.apply(source)); };
     }
 
     /**
