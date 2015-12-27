@@ -32,8 +32,8 @@ public class BijectiveCorrespondence<Source, Result> implements Bijection<Source
      * @param <Result> type of the conversion result
      */
     public static class Builder<Source, Result> {
-        private final DirectCorrespondence.Builder<Source, Result> directMap = Conversions.newCorrespondence();
-        private final DirectCorrespondence.Builder<Result, Source> reverseMap = Conversions.newCorrespondence();
+        private final DirectCorrespondence.Builder<Source, Result> directCorrespondence = Conversions.newCorrespondence();
+        private final DirectCorrespondence.Builder<Result, Source> reverseCorrespondence = Conversions.newCorrespondence();
 
         /**
          * Configure bijective instance-to-instance mapping between the given arguments.
@@ -42,8 +42,8 @@ public class BijectiveCorrespondence<Source, Result> implements Bijection<Source
          * @return this builder instance
          */
         public BijectiveCorrespondence.Builder<Source, Result> add(Source source, Result result) {
-            directMap.add(source, result);
-            reverseMap.add(result, source);
+            directCorrespondence.add(source, result);
+            reverseCorrespondence.add(result, source);
 
             return this;
         }
@@ -54,13 +54,25 @@ public class BijectiveCorrespondence<Source, Result> implements Bijection<Source
          * @return this instance
          */
         public Builder<Source, Result> addAll(Map<Source, Result> mapping) {
-            if (mapping.keySet().stream().anyMatch(directMap::isAlreadyRegistered)) {
+            if (mapping.keySet().stream().anyMatch(directCorrespondence::isAlreadyRegistered)) {
                 throw new IllegalArgumentException("There is already registered direct conversion for the given argument.");
             }
-            if (mapping.values().stream().anyMatch(reverseMap::isAlreadyRegistered)) {
+            if (mapping.values().stream().anyMatch(reverseCorrespondence::isAlreadyRegistered)) {
                 throw new IllegalArgumentException("There is already registered reverse conversion for the given argument.");
             }
             mapping.forEach(this::add);
+
+            return this;
+        }
+
+        /**
+         * Specify default behavior for the bijection when correspondence wasn't found.
+         * @param defaultBijection bijection which will be executed when main conversion can't find result
+         * @return this instance
+         */
+        public Builder<Source, Result> defaultingTo(Bijection<Source, Result> defaultBijection) {
+            directCorrespondence.defaultingTo(defaultBijection::convert);
+            reverseCorrespondence.defaultingTo(defaultBijection::revert);
 
             return this;
         }
@@ -70,7 +82,7 @@ public class BijectiveCorrespondence<Source, Result> implements Bijection<Source
          * @return initialized bijective correspondence
          */
         public Bijection<Source, Result> build() {
-            return new BijectiveCorrespondence<>(directMap.build(), reverseMap.build().asReverse());
+            return new BijectiveCorrespondence<>(directCorrespondence.build(), reverseCorrespondence.build().asReverse());
         }
     }
 }

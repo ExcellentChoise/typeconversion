@@ -101,4 +101,17 @@ public class BijectiveCorrespondenceTest {
         assertThatThrownBy(() -> bijection.convert("a")).isInstanceOf(ConversionFailedException.class);
         assertThatThrownBy(() -> bijection.revert("y")).isInstanceOf(ConversionFailedException.class);
     }
+
+    @Test
+    public void whenDefaultBijectionSpecified_bijectiveCorrespondence_shouldUseItWhenThereIsNoConversionForTheGivenKey() {
+        Bijection<String, String> bijection = Conversions.<String, String>newBijectiveCorrespondence()
+                .defaultingTo(Bijection.from(source -> "passed", result -> "test"))
+                .build();
+
+        String result = bijection.convert("test");
+        String source = bijection.revert(result);
+
+        assertThat(source).isEqualTo("test");
+        assertThat(result).isEqualTo("passed");
+    }
 }

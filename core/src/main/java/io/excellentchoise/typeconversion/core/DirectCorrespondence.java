@@ -10,9 +10,11 @@ import java.util.Map;
  */
 public class DirectCorrespondence<Source, Result> implements Conversion<Source, Result> {
     private final Map<Source, Result> directMap;
+    private final Conversion<Source, Result> defaultConversion;
 
-    private DirectCorrespondence(Map<Source, Result> directMap) {
+    private DirectCorrespondence(Map<Source, Result> directMap, Conversion<Source, Result> defaultConversion) {
         this.directMap = directMap;
+        this.defaultConversion = defaultConversion;
     }
 
     @Override
@@ -21,7 +23,7 @@ public class DirectCorrespondence<Source, Result> implements Conversion<Source, 
         if (result != null) {
             return result;
         } else {
-            throw new ConversionFailedException("There is no correspondence registered for the given argument");
+            return defaultConversion.convert(source);
         }
     }
 
@@ -32,6 +34,9 @@ public class DirectCorrespondence<Source, Result> implements Conversion<Source, 
      */
     public static class Builder<Source, Result> {
         private final Map<Source, Result> directMap = new HashMap<>();
+        private Conversion<Source, Result> defaultConversion = Conversions.throwing(
+                "There is no correspondence registered for the given argument"
+        );
 
         /**
          * Configure instance-to-instance correspondence between the given arguments.
@@ -64,11 +69,22 @@ public class DirectCorrespondence<Source, Result> implements Conversion<Source, 
         }
 
         /**
+         * Specify default behavior for the conversion when correspondence wasn't found.
+         * @param defaultConversion conversion which will be executed when the given source wasn't found
+         * @return this instance
+         */
+        public Builder<Source, Result> defaultingTo(Conversion<Source, Result> defaultConversion) {
+            this.defaultConversion = defaultConversion;
+
+            return this;
+        }
+
+        /**
          * Build {@link DirectCorrespondence} based on the given configuration.
          * @return initialized direct correspondence
          */
         public Conversion<Source, Result> build() {
-            return new DirectCorrespondence<>(directMap);
+            return new DirectCorrespondence<>(directMap, defaultConversion);
         }
 
         /**

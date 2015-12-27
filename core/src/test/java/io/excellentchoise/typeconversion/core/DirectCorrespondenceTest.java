@@ -64,4 +64,15 @@ public class DirectCorrespondenceTest {
 
         assertThatThrownBy(() -> conversion.convert("a")).isInstanceOf(ConversionFailedException.class);
     }
+
+    @Test
+    public void whenDefaultConversionSpecified_convert_shouldUseItWhenThereIsNoCorrespondenceForTheGivenKey() {
+        Conversion<String, String> conversion = Conversions.<String, String>newCorrespondence()
+                .defaultingTo(source -> "passed")
+                .build();
+
+        String result = conversion.convert("test");
+
+        assertThat(result).isEqualTo("passed");
+    }
 }

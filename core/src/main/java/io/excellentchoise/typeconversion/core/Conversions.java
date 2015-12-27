@@ -51,7 +51,9 @@ public final class Conversions {
      * @return exception throwing conversion
      */
     public static <Source, Result> Conversion<Source, Result> throwing(Function<Source, String> messageMaker) {
-        return (source) -> { throw new ConversionFailedException(messageMaker.apply(source)); };
+        return (source) -> {
+            throw new ConversionFailedException(messageMaker.apply(source));
+        };
     }
 
     /**
