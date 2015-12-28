@@ -1,5 +1,6 @@
 package io.excellentchoise.typeconversion.core;
 
+import javax.xml.transform.Result;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -106,9 +107,20 @@ public final class Conversions {
      * Create a builder for {@link BijectiveCorrespondence} used to bijectively map some instances to another ones.
      * @param <Source> type to be converted
      * @param <Result> type of the conversion result
-     * @return bijection between configured instances
+     * @return builder for bijection between configured instances
      */
     public static <Source, Result> BijectiveCorrespondence.Builder<Source, Result> newBijectiveCorrespondence() {
         return new BijectiveCorrespondence.Builder<>();
+    }
+
+    /**
+     * Create a builder for {@link ConditionalConversion} used to conditionally apply other conversions
+     * if the source satisfies their requirements.
+     * @param <Source> type to be converted
+     * @param <Result> type of the conversion result
+     * @return builder for {@link ConditionalConversion}
+     */
+    public static <Source, Result> ConditionalConversion.Builder<Source, Result> conditional() {
+        return new ConditionalConversion.Builder<>();
     }
 }
