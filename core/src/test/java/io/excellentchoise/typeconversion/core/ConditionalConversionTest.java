@@ -35,4 +35,15 @@ public class ConditionalConversionTest {
 
         assertThatThrownBy(() -> conversion.convert("test")).isInstanceOf(ConversionFailedException.class);
     }
+
+    @Test
+    public void whenDefaultConversionSpecified_convert_shouldUseItWhenSourceDoesntMatchAnyCases() {
+        Conversion<String, String> conversion = Conversions.<String, String>conditional()
+                .otherwise(str -> "passed")
+                .build();
+
+        String result = conversion.convert("test");
+
+        assertThat(result).isEqualTo("passed");
+    }
 }

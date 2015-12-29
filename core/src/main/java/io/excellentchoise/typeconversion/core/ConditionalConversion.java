@@ -13,9 +13,11 @@ import java.util.stream.Collectors;
  */
 public class ConditionalConversion<Source, Result> implements Conversion<Source, Result> {
     private final Map<Predicate<Source>, Conversion<Source, Result>> cases;
+    private final Conversion<Source, Result> defaultConversion;
 
-    private ConditionalConversion(Map<Predicate<Source>, Conversion<Source, Result>> cases) {
+    private ConditionalConversion(Map<Predicate<Source>, Conversion<Source, Result>> cases, Conversion<Source, Result> defaultConversion) {
         this.cases = cases;
+        this.defaultConversion = defaultConversion;
     }
 
     @Override
@@ -25,7 +27,7 @@ public class ConditionalConversion<Source, Result> implements Conversion<Source,
                 .collect(Collectors.toList());
 
         if (matchedCases.size() < 1) {
-            throw new ConversionFailedException("Can't find conversion for the given source");
+            return defaultConversion.convert(source);
         } else if (matchedCases.size() > 1) {
             throw new ConversionFailedException("Multiple conditions are satisfied for the given source");
         } else {
@@ -40,6 +42,7 @@ public class ConditionalConversion<Source, Result> implements Conversion<Source,
      */
     public static class Builder<Source, Result> {
         private final Map<Predicate<Source>, Conversion<Source, Result>> cases = new HashMap<>();
+        private Conversion<Source, Result> defaultConversion = Conversions.throwing("Can't find conversion for the given source");
 
         /**
          * Specify specification on the conversion source and corresponding object for such case.
@@ -54,11 +57,22 @@ public class ConditionalConversion<Source, Result> implements Conversion<Source,
         }
 
         /**
+         * Specify default conversion which will be called when there is no eligible case for the given source.
+         * @param defaultConversion default conversion
+         * @return this instance
+         */
+        public Builder<Source, Result> otherwise(Conversion<Source, Result> defaultConversion) {
+            this.defaultConversion = defaultConversion;
+
+            return this;
+        }
+
+        /**
          * Build a {@link ConditionalConversion} based on the given configuration.
          * @return initialized conditional conversion
          */
         public Conversion<Source, Result> build() {
-            return new ConditionalConversion<>(cases);
+            return new ConditionalConversion<>(cases, defaultConversion);
         }
     }
 }
