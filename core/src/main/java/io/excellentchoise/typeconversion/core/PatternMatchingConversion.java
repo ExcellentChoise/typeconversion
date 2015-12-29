@@ -1,42 +1,39 @@
 package io.excellentchoise.typeconversion.core;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * Conversion which will execute configured predicates to choose proper conversion for the given source.
  * @param <Source> type to be converted
  * @param <Result> type of the conversion result
  */
-public class ConditionalConversion<Source, Result> implements Conversion<Source, Result> {
+public class PatternMatchingConversion<Source, Result> implements Conversion<Source, Result> {
     private final Map<Predicate<Source>, Conversion<Source, Result>> cases;
     private final Conversion<Source, Result> defaultConversion;
 
-    private ConditionalConversion(Map<Predicate<Source>, Conversion<Source, Result>> cases, Conversion<Source, Result> defaultConversion) {
+    private PatternMatchingConversion(
+            Map<Predicate<Source>, Conversion<Source, Result>> cases,
+            Conversion<Source, Result> defaultConversion
+    ) {
         this.cases = cases;
         this.defaultConversion = defaultConversion;
     }
 
     @Override
     public Result convert(Source source) {
-        List<Map.Entry<Predicate<Source>, Conversion<Source, Result>>> matchedCases = cases.entrySet().stream()
-                .filter(x -> x.getKey().test(source))
-                .collect(Collectors.toList());
-
-        if (matchedCases.size() < 1) {
-            return defaultConversion.convert(source);
-        } else if (matchedCases.size() > 1) {
-            throw new ConversionFailedException("Multiple conditions are satisfied for the given source");
-        } else {
-            return matchedCases.get(0).getValue().convert(source);
+        for (Map.Entry<Predicate<Source>, Conversion<Source, Result>> conversionCase : cases.entrySet()) {
+            if (conversionCase.getKey().test(source)) {
+                return conversionCase.getValue().convert(source);
+            }
         }
+
+        return defaultConversion.convert(source);
     }
 
     /**
-     * Builder for {@link ConditionalConversion} used to configure it.
+     * Builder for {@link PatternMatchingConversion} used to configure it.
      * @param <Source> type to be converted
      * @param <Result> type of the conversion result
      */
@@ -57,7 +54,7 @@ public class ConditionalConversion<Source, Result> implements Conversion<Source,
         }
 
         /**
-         * Specify default conversion which will be called when there is no eligible case for the given source.
+         * Specify default conversion which will be called when there is no match for the given source.
          * @param defaultConversion default conversion
          * @return this instance
          */
@@ -68,11 +65,11 @@ public class ConditionalConversion<Source, Result> implements Conversion<Source,
         }
 
         /**
-         * Build a {@link ConditionalConversion} based on the given configuration.
-         * @return initialized conditional conversion
+         * Build a {@link PatternMatchingConversion} based on the given configuration.
+         * @return initialized pattern matching conversion
          */
         public Conversion<Source, Result> build() {
-            return new ConditionalConversion<>(cases, defaultConversion);
+            return new PatternMatchingConversion<>(cases, defaultConversion);
         }
     }
 }

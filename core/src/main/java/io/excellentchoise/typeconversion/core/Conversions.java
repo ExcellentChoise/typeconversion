@@ -1,6 +1,5 @@
 package io.excellentchoise.typeconversion.core;
 
-import javax.xml.transform.Result;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -114,13 +113,13 @@ public final class Conversions {
     }
 
     /**
-     * Create a builder for {@link ConditionalConversion} used to conditionally apply other conversions
+     * Create a builder for {@link PatternMatchingConversion} used to conditionally apply other conversions
      * if the source satisfies their requirements.
      * @param <Source> type to be converted
      * @param <Result> type of the conversion result
-     * @return builder for {@link ConditionalConversion}
+     * @return builder for {@link PatternMatchingConversion}
      */
-    public static <Source, Result> ConditionalConversion.Builder<Source, Result> conditional() {
-        return new ConditionalConversion.Builder<>();
+    public static <Source, Result> PatternMatchingConversion.Builder<Source, Result> patternMatching() {
+        return new PatternMatchingConversion.Builder<>();
     }
 }

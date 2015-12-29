@@ -5,10 +5,10 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class ConditionalConversionTest {
+public class PatternMatchingConversionTest {
     @Test
     public void whenConditionForSourceIsSpecified_convert_shouldUseCorrespondingConversionForIt() {
-        Conversion<String, String> conversion = Conversions.<String, String>conditional()
+        Conversion<String, String> conversion = Conversions.<String, String>patternMatching()
                 .inCaseOf(src -> src.startsWith("test"), src -> "passed")
                 .build();
 
@@ -19,7 +19,7 @@ public class ConditionalConversionTest {
 
     @Test
     public void whenConditionForSourceIsNotSpecified_convert_shouldThrowException() {
-        Conversion<String, String> conversion = Conversions.<String, String>conditional()
+        Conversion<String, String> conversion = Conversions.<String, String>patternMatching()
                 .inCaseOf(src -> src.startsWith("test"), src -> "passed")
                 .build();
 
@@ -27,18 +27,20 @@ public class ConditionalConversionTest {
     }
 
     @Test
-    public void whenSourceMatchesMultipleConditions_convert_shouldThrowException() {
-        Conversion<String, String> conversion = Conversions.<String, String>conditional()
+    public void whenSourceMatchesMultipleConditions_convert_shouldUseTheFirstConfiguredCase() {
+        Conversion<String, String> conversion = Conversions.<String, String>patternMatching()
                 .inCaseOf(src -> src.startsWith("test"), src -> "passed")
                 .inCaseOf(src -> src.endsWith("test"), src -> "failed")
                 .build();
 
-        assertThatThrownBy(() -> conversion.convert("test")).isInstanceOf(ConversionFailedException.class);
+        String result = conversion.convert("test");
+
+        assertThat(result).isEqualTo("passed");
     }
 
     @Test
     public void whenDefaultConversionSpecified_convert_shouldUseItWhenSourceDoesntMatchAnyCases() {
-        Conversion<String, String> conversion = Conversions.<String, String>conditional()
+        Conversion<String, String> conversion = Conversions.<String, String>patternMatching()
                 .otherwise(str -> "passed")
                 .build();
 
