@@ -122,4 +122,16 @@ public final class Conversions {
     public static <Source, Result> PatternMatchingConversion.Builder<Source, Result> patternMatching() {
         return new PatternMatchingConversion.Builder<>();
     }
+
+    /**
+     * Create a conversion which casts the source type to result type.
+     * @param sourceClass class of the conversion source
+     * @param resultClass class of the conversion result
+     * @param <Source> type to be converted
+     * @param <Result> type of the conversion result
+     * @return initialized type casting conversion
+     */
+    public static <Source, Result> Conversion<Source, Result> casting(Class<Source> sourceClass, Class<Result> resultClass) {
+        return new TypeCastingConversion<>(sourceClass, resultClass);
+    }
 }
