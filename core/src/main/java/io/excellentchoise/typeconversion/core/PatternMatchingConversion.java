@@ -1,7 +1,6 @@
 package io.excellentchoise.typeconversion.core;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -10,11 +9,11 @@ import java.util.function.Predicate;
  * @param <Result> type of the conversion result
  */
 public class PatternMatchingConversion<Source, Result> implements Conversion<Source, Result> {
-    private final Map<Predicate<Source>, Conversion<Source, Result>> cases;
+    private final List<Map.Entry<Predicate<Source>, Conversion<Source, Result>>> cases;
     private final Conversion<Source, Result> defaultConversion;
 
     private PatternMatchingConversion(
-            Map<Predicate<Source>, Conversion<Source, Result>> cases,
+            List<Map.Entry<Predicate<Source>, Conversion<Source, Result>>> cases,
             Conversion<Source, Result> defaultConversion
     ) {
         this.cases = cases;
@@ -23,7 +22,7 @@ public class PatternMatchingConversion<Source, Result> implements Conversion<Sou
 
     @Override
     public Result convert(Source source) {
-        for (Map.Entry<Predicate<Source>, Conversion<Source, Result>> conversionCase : cases.entrySet()) {
+        for (Map.Entry<Predicate<Source>, Conversion<Source, Result>> conversionCase : cases) {
             if (conversionCase.getKey().test(source)) {
                 return conversionCase.getValue().convert(source);
             }
@@ -38,7 +37,7 @@ public class PatternMatchingConversion<Source, Result> implements Conversion<Sou
      * @param <Result> type of the conversion result
      */
     public static class Builder<Source, Result> {
-        private final Map<Predicate<Source>, Conversion<Source, Result>> cases = new HashMap<>();
+        private final List<Map.Entry<Predicate<Source>, Conversion<Source, Result>>> cases = new ArrayList<>();
         private Conversion<Source, Result> defaultConversion = Conversions.throwing("Can't find conversion for the given source");
 
         /**
@@ -48,7 +47,7 @@ public class PatternMatchingConversion<Source, Result> implements Conversion<Sou
          * @return this instance
          */
         public Builder<Source, Result> inCaseOf(Predicate<Source> condition, Conversion<Source, Result> conversion) {
-            cases.put(condition, conversion);
+            cases.add(new AbstractMap.SimpleEntry<>(condition, conversion));
 
             return this;
         }
