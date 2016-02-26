@@ -32,8 +32,8 @@ public class BijectiveCorrespondence<Source, Result> implements Bijection<Source
      * @param <Result> type of the conversion result
      */
     public static class Builder<Source, Result> {
-        private final DirectCorrespondence.Builder<Source, Result> directCorrespondence = Conversions.newCorrespondence();
-        private final DirectCorrespondence.Builder<Result, Source> reverseCorrespondence = Conversions.newCorrespondence();
+        private final DirectCorrespondence.Builder<Source, Result> directCorrespondence = Conversions.correspondence().direct();
+        private final DirectCorrespondence.Builder<Result, Source> reverseCorrespondence = Conversions.correspondence().direct();
 
         /**
          * Configure bijective instance-to-instance mapping between the given arguments.
@@ -41,7 +41,7 @@ public class BijectiveCorrespondence<Source, Result> implements Bijection<Source
          * @param result second instance
          * @return this builder instance
          */
-        public BijectiveCorrespondence.Builder<Source, Result> add(Source source, Result result) {
+        public Builder<Source, Result> add(Source source, Result result) {
             directCorrespondence.add(source, result);
             reverseCorrespondence.add(result, source);
 

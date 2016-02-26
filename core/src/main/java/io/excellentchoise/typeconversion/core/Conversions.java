@@ -1,6 +1,5 @@
 package io.excellentchoise.typeconversion.core;
 
-import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -8,6 +7,7 @@ import java.util.function.Function;
  */
 public final class Conversions {
     private static final Conversion IDENTITY = x -> x;
+    private static final CorrespondenceBuilder CORRESPONDENCE_BUILDER = new CorrespondenceBuilder();
 
     private Conversions() {}
 
@@ -71,45 +71,11 @@ public final class Conversions {
     }
 
     /**
-     * Create conversion from key-value pairs of the given map.
-     * @param mapping key-value mapping
-     * @param <Source> type to be converted
-     * @param <Result> type of the conversion result
-     * @return conversion which uses the given map to resolve value for key
+     * Start creation of arbitrary correspondence (1-to-1 mapping between some values).
+     * @return a builder which will allow to choose correspondence format
      */
-    public static <Source, Result> Conversion<Source, Result> fromMap(Map<Source, Result> mapping) {
-        return Conversions.<Source, Result>newCorrespondence().addAll(mapping).build();
-    }
-
-    /**
-     * Create a builder for {@link DirectCorrespondence} used to convert some instances to instances corresponding to them.
-     * @param <Source> type to be converted
-     * @param <Result> type of the conversion result
-     * @return conversion from configured instances of source type to configured instances of result type
-     */
-    public static <Source, Result> DirectCorrespondence.Builder<Source, Result> newCorrespondence() {
-        return new DirectCorrespondence.Builder<>();
-    }
-
-    /**
-     * Create bijection from key-value pairs of the given map.
-     * @param mapping key-value mapping
-     * @param <Source> type to be converted
-     * @param <Result> type of the conversion result
-     * @return bijection which uses the given map to do key-to-value and value-to-key mappings
-     */
-    public static <Source, Result> Bijection<Source, Result> fromBijectiveMap(Map<Source, Result> mapping) {
-        return Conversions.<Source, Result>newBijectiveCorrespondence().addAll(mapping).build();
-    }
-
-    /**
-     * Create a builder for {@link BijectiveCorrespondence} used to bijectively map some instances to another ones.
-     * @param <Source> type to be converted
-     * @param <Result> type of the conversion result
-     * @return builder for bijection between configured instances
-     */
-    public static <Source, Result> BijectiveCorrespondence.Builder<Source, Result> newBijectiveCorrespondence() {
-        return new BijectiveCorrespondence.Builder<>();
+    public static CorrespondenceBuilder correspondence() {
+        return CORRESPONDENCE_BUILDER;
     }
 
     /**

@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class DirectCorrespondenceTest {
     @Test
     public void whenMultipleValuesForTheSameKeyGotRegistered_builder_shouldThrowException() {
-        assertThatThrownBy(() -> Conversions.<String, String>newCorrespondence()
+        assertThatThrownBy(() -> Conversions.correspondence().<String, String>direct()
                 .add("test", "passed")
                 .add("test", "failed")
                 .build()
@@ -22,7 +22,7 @@ public class DirectCorrespondenceTest {
     @Test
     public void whenCorrespondenceWasRegistered_convert_shouldReturnInstanceCorrespondingToTheGivenKey() {
         Object expectedResult = LocalDateTime.now();
-        Conversion<String, Object> conversion = Conversions.<String, Object>newCorrespondence()
+        Conversion<String, Object> conversion = Conversions.correspondence().<String, Object>direct()
                 .add("test", expectedResult)
                 .build();
 
@@ -33,7 +33,7 @@ public class DirectCorrespondenceTest {
 
     @Test
     public void whenMapGiven_builder_shouldCreateValidCorrespondenceFromIt() {
-        Conversion<String, String> conversion = Conversions.fromMap(Collections.singletonMap("test", "passed"));
+        Conversion<String, String> conversion = Conversions.<String, String>correspondence().fromMap(Collections.singletonMap("test", "passed"));
 
         String result = conversion.convert("test");
 
@@ -42,14 +42,14 @@ public class DirectCorrespondenceTest {
 
     @Test
     public void whenCorrespondenceWasNotRegisteredForTheGivenKey_convert_shouldThrowException() {
-        Conversion<String, String> conversion = Conversions.<String, String>newCorrespondence().build();
+        Conversion<String, String> conversion = Conversions.correspondence().<String, String>direct().build();
 
         assertThatThrownBy(() -> conversion.convert("test")).isInstanceOf(ConversionFailedException.class);
     }
 
     @Test
     public void whenAllElementsFromMapGotAddedToTheBuilder_andSomeElementsAlreadyExist_addAll_shouldThrowExceptionAndNotModifyBuildingObject() {
-        DirectCorrespondence.Builder<String, String> builder = Conversions.<String, String>newCorrespondence()
+        DirectCorrespondence.Builder<String, String> builder = Conversions.correspondence().<String, String>direct()
                 .add("c", "d");
 
         assertThatThrownBy(() ->
@@ -67,7 +67,7 @@ public class DirectCorrespondenceTest {
 
     @Test
     public void whenDefaultConversionSpecified_convert_shouldUseItWhenThereIsNoCorrespondenceForTheGivenKey() {
-        Conversion<String, String> conversion = Conversions.<String, String>newCorrespondence()
+        Conversion<String, String> conversion = Conversions.correspondence().<String, String>direct()
                 .defaultingTo(source -> "passed")
                 .build();
 
