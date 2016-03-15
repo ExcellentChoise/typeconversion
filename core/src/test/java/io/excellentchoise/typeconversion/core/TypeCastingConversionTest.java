@@ -8,12 +8,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class TypeCastingConversionTest {
     @Test
     public void whenSourceTypeCanBeCastedToResult_castingConversion_shouldCastSourceToResult() {
-        assertThat(Conversions.casting(Integer.class, Number.class).convert(5)).isEqualTo(5);
+        assertThat(Conversions.casting(ConversionSignature.from(Integer.class, Number.class)).convert(5)).isEqualTo(5);
     }
 
     @Test
     public void whenSourceTypeCantBeCastedToResult_castingConversion_shouldThrowExceptionBeforeConstruction() {
-        assertThatThrownBy(() -> Conversions.casting(String.class, Integer.class))
+        assertThatThrownBy(() -> Conversions.casting(ConversionSignature.from(String.class, Integer.class)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

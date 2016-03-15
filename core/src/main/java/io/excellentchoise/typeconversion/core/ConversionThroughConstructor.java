@@ -11,11 +11,9 @@ import java.util.Objects;
  */
 public class ConversionThroughConstructor<Source, Result> implements Conversion<Source, Result> {
     private final Constructor<Result> constructor;
-    private Class<Result> resultClass;
 
-    public ConversionThroughConstructor(Class<Source> sourceClass, Class<Result> resultClass) {
-        this.resultClass = resultClass;
-        this.constructor = findConstructorBy(resultClass, sourceClass);
+    ConversionThroughConstructor(ConversionSignature<Source, Result> signature) {
+        this.constructor = findConstructorBy(signature);
     }
 
     @Override
@@ -24,15 +22,17 @@ public class ConversionThroughConstructor<Source, Result> implements Conversion<
         try {
             return constructor.newInstance(source);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new ConversionFailedException("Failed to create " + resultClass + " by " + source, e);
+            throw new ConversionFailedException("Failed to create " + constructor.getDeclaringClass() + " by " + source, e);
         }
     }
 
-    private Constructor<Result> findConstructorBy(Class<Result> constructedClass, Class<Source> constructorParameter) {
+    private Constructor<Result> findConstructorBy(ConversionSignature<Source, Result> signature) {
         try {
-            return constructedClass.getConstructor(constructorParameter);
+            return signature.getResultClass().getConstructor(signature.getSourceClass());
         } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException("Failed to find constructor of " + constructedClass + " by " + constructorParameter);
+            throw new IllegalArgumentException(
+                    "Failed to find constructor of " + signature.getResultClass() + " by " + signature.getSourceClass(), e
+            );
         }
     }
 }

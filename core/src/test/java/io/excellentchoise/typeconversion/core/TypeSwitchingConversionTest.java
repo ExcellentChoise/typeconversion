@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class TypeSwitchingConversionTest {
     @Test
     public void whenConversionForTheMostConcreteTypeOfObjectConfigured_typeSwitch_shouldUseItForConversion() {
-        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(Object.class, Integer.class)
+        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(ConversionSignature.from(Object.class, Integer.class))
                 .forType(String.class, String::length)
                 .build();
 
@@ -22,7 +22,7 @@ public class TypeSwitchingConversionTest {
 
     @Test
     public void whenConversionForConcreteTypeIsUnknown_butConversionForBaseClassSpecified_typeSwitch_shouldUseItForConversion() {
-        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(Object.class, Integer.class)
+        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(ConversionSignature.from(Object.class, Integer.class))
                 .forType(CharSequence.class, CharSequence::length)
                 .build();
 
@@ -33,7 +33,7 @@ public class TypeSwitchingConversionTest {
 
     @Test
     public void whenConversionForConcreteTypeAndItsBaseClassSpecified_typeSwitch_shouldUseMostConcreteConversion() {
-        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(Object.class, Integer.class)
+        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(ConversionSignature.from(Object.class, Integer.class))
                 .forType(CharSequence.class, CharSequence::length)
                 .forType(String.class, Integer::parseInt)
                 .build();
@@ -45,7 +45,7 @@ public class TypeSwitchingConversionTest {
 
     @Test
     public void whenTwoDifferentlyTypedConversionsSpecified_typeSwitch_shouldReturnDifferentResultsForDifferentlyTypedInput() {
-        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(Object.class, Integer.class)
+        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(ConversionSignature.from(Object.class, Integer.class))
                 .forType(Integer.class, i -> i + 5)
                 .forType(String.class, Integer::parseInt)
                 .build();
@@ -59,7 +59,7 @@ public class TypeSwitchingConversionTest {
 
     @Test
     public void whenThereIsNoSuitableConversionForTheConcreteType_typeSwitch_shouldUseConfiguredDefaultConversion() {
-        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(Object.class, Integer.class)
+        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(ConversionSignature.from(Object.class, Integer.class))
                 .defaultingTo(src -> 5)
                 .build();
 
@@ -70,14 +70,14 @@ public class TypeSwitchingConversionTest {
 
     @Test
     public void whenThereIsNoSuitableConversionForTheConcreteType_andDefaultIsNotConfigured_typeSwitch_shouldThrowException() {
-        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(Object.class, Integer.class).build();
+        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(ConversionSignature.from(Object.class, Integer.class)).build();
 
         assertThatThrownBy(() -> typeSwitch.convert("any string")).isInstanceOf(ConversionFailedException.class);
     }
 
     @Test
     public void whenClassImplementsMultipleInterfaces_andEachInterfaceHasOwnConversion_typeSwitch_shouldUseConversionForFirstDeclaredInterface() {
-        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(Object.class, Integer.class)
+        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(ConversionSignature.from(Object.class, Integer.class))
                 .forType(Comparable.class, Object::hashCode)
                 .forType(CharSequence.class, seq -> Integer.parseInt(seq.toString()))
                 .build();
@@ -88,7 +88,7 @@ public class TypeSwitchingConversionTest {
 
     @Test
     public void whenClassExtendsBaseClass_andImplementsInterface_andConversionsForThemAreConfigured_typeSwitch_shouldUseConversionForBaseClass() {
-        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(Object.class, Integer.class)
+        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(ConversionSignature.from(Object.class, Integer.class))
                 .forType(Number.class, Number::intValue)
                 .forType(Comparable.class, Object::hashCode)
                 .build();
@@ -99,7 +99,7 @@ public class TypeSwitchingConversionTest {
 
     @Test
     public void whenThereIsNoSpecificConversionForBaseClassesAndInterfaces_typeSwitch_shouldTryToFindConversionsForMoreAbstractClasses() {
-        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(Object.class, Integer.class)
+        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(ConversionSignature.from(Object.class, Integer.class))
                 .forType(Collection.class, Collection::size)
                 .build();
 
@@ -109,7 +109,7 @@ public class TypeSwitchingConversionTest {
 
     @Test
     public void whenNullGiven_ifNotSpecifiedExplicitly_typeSwitch_shouldForwardItToDefaultConversion() {
-        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(Object.class, Integer.class)
+        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(ConversionSignature.from(Object.class, Integer.class))
                 .forType(Integer.class, x -> x)
                 .defaultingTo(x -> 5)
                 .build();
@@ -121,7 +121,7 @@ public class TypeSwitchingConversionTest {
 
     @Test
     public void whenNullGiven_andTypeSwitchConfiguredToPreserveNulls_typeSwitch_shouldReturnNull() {
-        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(Object.class, Integer.class)
+        Conversion<Object, Integer> typeSwitch = Conversions.typeSwitch(ConversionSignature.from(Object.class, Integer.class))
                 .forType(Integer.class, x -> x)
                 .defaultingTo(x -> 5)
                 .preservingNulls()

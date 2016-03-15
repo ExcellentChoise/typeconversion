@@ -58,15 +58,14 @@ public final class Conversions {
 
     /**
      * Create a builder for {@link TypeSwitchingConversion} used to convert arbitrary objects based on the type of Source argument.
-     * @param sourceClass class of Source
-     * @param resultClass class of Result
+     * @param signature signature of the required conversion
      * @param <Source> type to be converted
      * @param <Result> type of the conversion result
      * @return a builder for {@link TypeSwitchingConversion}
      */
     @SuppressWarnings("unused")
     public static <Source, Result> TypeSwitchingConversion.Builder<Source, Result> typeSwitch(
-            Class<Source> sourceClass, Class<Result> resultClass) {
+            ConversionSignature<Source, Result> signature) {
         return TypeSwitchingConversion.newBuilder();
     }
 
@@ -91,13 +90,24 @@ public final class Conversions {
 
     /**
      * Create a conversion which casts the source type to result type.
-     * @param sourceClass class of the conversion source
-     * @param resultClass class of the conversion result
+     * @param signature signature of the required conversion
      * @param <Source> type to be converted
      * @param <Result> type of the conversion result
      * @return initialized type casting conversion
      */
-    public static <Source, Result> Conversion<Source, Result> casting(Class<Source> sourceClass, Class<Result> resultClass) {
-        return new TypeCastingConversion<>(sourceClass, resultClass);
+    public static <Source, Result> Conversion<Source, Result> casting(ConversionSignature<Source, Result> signature) {
+        return new TypeCastingConversion<>(signature);
+    }
+
+    /**
+     * Create a conversion which will use single-argument constructor of the result class
+     * which accepts source as parameter.
+     * @param signature signature of the required conversion
+     * @param <Source> type to be converted
+     * @param <Result> type of the conversion result
+     * @return initialized conversion through constructor
+     */
+    public static <Source, Result> Conversion<Source, Result> throughConstructor(ConversionSignature<Source, Result> signature) {
+        return new ConversionThroughConstructor<>(signature);
     }
 }
