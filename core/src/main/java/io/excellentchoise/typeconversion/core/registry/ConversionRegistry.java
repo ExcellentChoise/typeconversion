@@ -12,6 +12,19 @@ import java.util.Optional;
  */
 public interface ConversionRegistry {
     /**
+     * Create conversion registry which can't find any conversion.
+     * @return empty registry
+     */
+    static ConversionRegistry empty() {
+        return new ConversionRegistry() {
+            @Override
+            public <Source, Result> Optional<Conversion<Source, Result>> findConversion(ConversionSignature<Source, Result> signature) {
+                return Optional.empty();
+            }
+        };
+    }
+
+    /**
      * Seek conversion with the given signature in registry.
      * @param signature conversion signature
      * @param <Source> type to be converted
