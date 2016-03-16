@@ -12,7 +12,7 @@ public class TypeCastingConversion<Source, Result> implements Conversion<Source,
      * @throws IllegalArgumentException if there is no way to cast source to result
      */
     TypeCastingConversion(ConversionSignature<Source, Result> signature) {
-        if (signature.definesGeneralization()) {
+        if (!signature.definesGeneralization()) {
             throw new IllegalArgumentException("There is no way to cast " + signature);
         }
     }

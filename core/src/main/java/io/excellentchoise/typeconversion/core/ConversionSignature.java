@@ -44,7 +44,7 @@ public class ConversionSignature<Source, Result> {
      * @return true if signature defines types generalization
      */
     public boolean definesGeneralization() {
-        return !resultClass.isAssignableFrom(sourceClass);
+        return resultClass.isAssignableFrom(sourceClass);
     }
 
     /**
