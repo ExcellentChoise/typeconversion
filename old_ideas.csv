@@ -1,0 +1,356 @@
+﻿TYPE,CONTENT,PRIORITY,INDENT,AUTHOR,RESPONSIBLE,DATE,DATE_LANG,TIMEZONE
+task,conversion.to(conv).using(convers),4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Conversion registries scoping,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Optimize implementation of conversions chain search,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Builder for conversion registry,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Consider introducing unsafe type casting conversion (e.g. Number -> Integer),4,1,Павел (12126225),,,en,Asia/Omsk
+note,"package io.excellentchoise.typeconversion.core.registry;
+
+import io.excellentchoise.typeconversion.core.Conversion;
+import io.excellentchoise.typeconversion.core.ConversionFailedException;
+import io.excellentchoise.typeconversion.core.ConversionSignature;
+
+import java.util.Optional;
+
+public class UnsafeTypeCasting implements ConversionRegistry {
+    @Override
+    @SuppressWarnings(""unchecked"")
+    public <Source, Result> Optional<Conversion<Source, Result>> getConversion(ConversionSignature<Source, Result> signature) {
+        if (signature.getSourceClass().isAssignableFrom(signature.getResultClass())) {
+            return Optional.of((source) -> {
+                if (signature.getResultClass().isAssignableFrom(source.getClass())) {
+                    return (Result) source;
+                } else {
+                    throw new ConversionFailedException(""Failed to convert source of type "" + source.getClass().getCanonicalName() + "" to "" + signature.getResultClass().getCanonicalName());
+                }
+            });
+        } else {
+            return Optional.empty();
+        }
+    }
+}",,,Павел (12126225),,,,
+,,,,,,,,
+task,Interface for builders,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Extend ConversionSignature on generics,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Correspondence - interaction with optionals,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,"Duplicate functionality of Dapper and AutoMapper with reflection conversion of objects http://modelmapper.org/ (ModelMapper - Simple, Intelligent, Object Mapping.)",4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Investigate different ways of library usage (singleton/instances creation),4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Defensive copying in builders to they won't be used after build,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Document exception contract for existing conversions,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Class[T] <-> String (Injection),4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Extract conversion registry from type switching,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Write Byte array conversions,4,1,Павел (12126225),,,en,Asia/Omsk
+note,"Array[Byte] <-> GZippedBytes
+Array[Byte] <-> Base64String
+Array[Byte] <-> GZippedBase64String
+Array[Byte] <-> java.nio.ByteBuffer",,,Павел (12126225),,,,
+,,,,,,,,
+task,Write collection conversions,4,1,Павел (12126225),,,en,Asia/Omsk
+note,"Single element -> collection
+Array to list
+set to list etc.",,,Павел (12126225),,,,
+,,,,,,,,
+task,Write conversions for numbers,4,1,Павел (12126225),,,en,Asia/Omsk
+note,"Number -> Byte
+Number -> Integer
+Number -> Short
+Number -> Float
+Number -> Double",,,Павел (12126225),,,,
+,,,,,,,,
+task,Write conversions for String,4,1,Павел (12126225),,,en,Asia/Omsk
+note,"Object -> String
+String -> String (split)
+Iterable<String> -> String (join)
+String -> Byte[]",,,Павел (12126225),,,,
+,,,,,,,,
+task,Write injections from Object to  Primitive system types,4,1,Павел (12126225),,,en,Asia/Omsk
+note,"Object -> BigDecimal
+Object -> Boolean
+Object -> Byte
+Object -> Character
+Object -> Double
+Object -> Float
+Object -> Integer
+Object -> Long
+Object -> Short",,,Павел (12126225),,,,
+,,,,,,,,
+task,Write conversions for bytes (can try to use HBase Bytes class),4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Conversion by constructor - investigate inherited types,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Investigate type-switch for generics,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Checks nulls preserving and handling,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Check NPE in Conversions,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Write README.md and project description,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Conversion.forCollection -- create conversion for list based on single element conversion,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Conversions - investigate covariance & contravariance,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,https://mail.google.com/mail/u/1/#search/protobuf/14d75706219b5919,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Add support for protobuf to bytes mapping,4,1,Павел (12126225),,,en,Asia/Omsk
+note,"package org.reducedata.server.util.serialization;
+
+import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.Message;
+import com.google.protobuf.MessageLite;
+
+import java.io.IOException;
+
+@SuppressWarnings(""unchecked"")
+public class ProtoBuilderToBytesMapper<TProto extends GeneratedMessage, TBuilder extends GeneratedMessage.Builder> implements Mapper<TBuilder, byte[]> {
+    private TProto defaultInstance;
+
+    public ProtoBuilderToBytesMapper(TProto defaultInstance) {
+        this.defaultInstance = defaultInstance;
+    }
+
+    @Override
+    public TBuilder deserialize(byte[] bytes) throws IOException {
+        Message.Builder builder = defaultInstance.newBuilderForType();
+        try {
+            builder.mergeFrom(bytes);
+
+            return (TBuilder) builder;
+        } catch (InvalidProtocolBufferException ignored) {
+            throw new IOException(ignored);
+        }
+    }
+
+    @Override
+    public byte[] serialize(TBuilder builder) throws IOException {
+        MessageLite built = builder.build();
+        return built.toByteArray();
+    }
+}
+
+package org.reducedata.server.util.serialization;
+
+import org.junit.Test;
+import org.reducedata.data.ProtoData.AdRequest;
+
+import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class ProtoBuilderToBytesMapperTest {
+    private Mapper<AdRequest.Builder, byte[]> mapper = new ProtoBuilderToBytesMapper<>(AdRequest.getDefaultInstance());
+
+    @Test
+    public void testMapping() throws IOException {
+        AdRequest.Builder builder = AdRequest.newBuilder();
+        builder.setAlgorithm(""TEST"");
+
+        byte[] bytes = mapper.serialize(builder);
+        AdRequest.Builder deserializedBuilder = mapper.deserialize(bytes);
+
+        assertThat(deserializedBuilder.getAlgorithm()).isEqualTo(""TEST"");
+    }
+}",,,Павел (12126225),,,,
+,,,,,,,,
+task,Add support for DataForwarder,4,1,Павел (12126225),,,en,Asia/Omsk
+note,"/**
+     * An interface for classes, that just transfer fields from one class to another
+     * @param <Source> fields source
+     * @param <Receiver> type of an object that will be enriched with the new data
+     */
+    interface DataForwarder<Source, Receiver> {
+        boolean isApplicableTo(Source source);
+        void forwardData(Source source, Receiver receiver);
+    }",,,Павел (12126225),,,,
+,,,,,,,,
+task,Add support for ObjectOutputStreamDeserializer/Serializer/Stream versions,4,1,Павел (12126225),,,en,Asia/Omsk
+,,,,,,,,
+task,Add support for Communication protocols,4,1,Павел (12126225),,,en,Asia/Omsk
+note,"/**
+ * Uses {@link java.io.ObjectInputStream} for objects receiving.
+ * @param <TObject>
+ */
+public class ObjectInputProtocol<TObject> implements ObjectReceivingProtocol<TObject> {
+    private ObjectInputStream input;
+
+    @Override
+    public void bind(InputStream inputStream) throws IOException {
+        input = new ObjectInputStream(inputStream);
+    }
+
+    @Override
+    @SuppressWarnings(""unchecked"")
+    public TObject readObject() throws IOException {
+        checkReceivingStarted();
+        try {
+            return (TObject) input.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(""Class of the received object was not found."", e);
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        checkReceivingStarted();
+        input.close();
+    }
+
+    private void checkReceivingStarted() {
+        if (input == null) {
+            throw new IllegalStateException(""You should call 'bind' method in order to start objects receiving."");
+        }
+    }
+}
+
+/**
+ * Uses {@link java.io.ObjectOutputStream} for object streaming.
+ * @param <TObject>
+ */
+public class ObjectOutputProtocol<TObject> implements ObjectStreamingProtocol<TObject> {
+    private ObjectOutputStream objectOutStream;
+
+    @Override
+    public void bind(OutputStream outStream) throws IOException {
+        objectOutStream = new ObjectOutputStream(outStream);
+    }
+
+    @Override
+    public void writeObject(TObject obj) throws IOException {
+        checkStreamingStarted();
+        objectOutStream.writeObject(obj);
+    }
+
+    @Override
+    public void close() throws IOException {
+        checkStreamingStarted();
+        objectOutStream.flush();
+        objectOutStream.close();
+    }
+
+    private void checkStreamingStarted() {
+        if (objectOutStream == null) {
+            throw new IllegalStateException(""Streaming was not started."");
+        }
+    }
+}
+
+/**
+ * Reads TObject instances from bound InputStream. Note, that you should call
+ * {@link #bind(java.io.InputStream)} method before any attempt to {@link #readObject()}
+ * @param <TObject>
+ */
+public interface ObjectReceivingProtocol<TObject> extends Closeable {
+
+    /**
+     * Configure protocol to receive objects from the given stream.
+     * @param inputStream a stream from which we can receive objects
+     * @throws java.io.IOException if failed to read from the stream
+     */
+    void bind(InputStream inputStream) throws IOException;
+
+    /**
+     * Read an object from stream.
+     * @return a valid object if reading was succeed or null if there are no objects in stream (non-blocking version)
+     * @throws IOException if any error occurred during the object reading
+     */
+    TObject readObject() throws IOException;
+}
+
+
+
+/**
+ * Writes TObject instances to bound OutputStream. Note, that you should call
+ * {@link #bind(java.io.OutputStream)} method before any attempt to {@link #writeObject(Object)}
+ * @param <TObject>
+ */
+public interface ObjectStreamingProtocol<TObject> extends Closeable {
+
+    /**
+     * Start objects streaming using the given stream as an output.
+     * @param outStream
+     * @throws IOException
+     */
+    void bind(OutputStream outStream) throws IOException;
+
+    /**
+     *  Write TObject instance to bound OutputStream.
+     * @param obj object to be written
+     * @throws IOException
+     */
+    void writeObject(TObject obj) throws IOException;
+}
+
+public class ObjectInputProtocolTest {
+    private ObjectInputProtocol<Date> receiver = new ObjectInputProtocol<>();
+
+    @Test(expected = IllegalStateException.class)
+    public void whenReceivingIsNotStarted_read_ShouldThrowException() throws IOException {
+        receiver.readObject();
+    }
+
+    @Test
+    public void whenObjectIsInStream_read_ShouldMaterializeIt() throws IOException {
+        ObjectOutputProtocol<Date> streamer = new ObjectOutputProtocol<>();
+        Date now = new Date();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        streamer.bind(out);
+        streamer.writeObject(now);
+
+        InputStream in = new ByteArrayInputStream(out.toByteArray());
+        receiver.bind(in);
+        Date receivedDate = receiver.readObject();
+
+        assertThat(receivedDate, is(now));
+    }
+}
+
+public class ObjectOutputProtocolTest {
+    @Test
+    public void whenObjectWasWritten_OutputStreamShouldNotBeEmpty() throws IOException {
+        ObjectOutputProtocol<Date> dateSerializer = new ObjectOutputProtocol<>();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        dateSerializer.bind(outputStream);
+        dateSerializer.writeObject(new Date());
+        dateSerializer.close();
+
+        byte[] serializedObject = outputStream.toByteArray();
+        assertThat(serializedObject.length, is(not(equalTo(0))));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void whenStreamingWasNotStarted_WriteMethodShouldThrowException() throws IOException {
+        ObjectOutputProtocol<Date> dateSerializer = new ObjectOutputProtocol<>();
+
+        dateSerializer.writeObject(new Date());
+    }
+}",,,Павел (12126225),,,,
+,,,,,,,,
+task,Similar libraries,4,1,Павел (12126225),,,en,Asia/Omsk
+note,"https://github.com/op4j/op4j/tree/master/src/main/java/org/op4j/functions
+
+https://github.com/tim-group/variance
+
+https://github.com/toddfast/typeconverter
+
+http://docs.spring.io/spring/docs/current/spring-framework-reference/html/validation.html#core-convert
+
+https://github.com/twitter/bijection
+
+https://github.com/DozerMapper/dozer [[file {""url"":""https:\/\/github.com\/op4j\/op4j\/tree\/master\/src\/main\/java\/org\/op4j\/functions"",""description"":""op4j is a developer happiness tool. Its aim is to reduce the amount of similar lines of code needed to do every day tasks in our code by providing an operator chaining tool to perform easy iterations on lists, OGNL evaluation, data type conversion..."",""resource_type"":""website"",""title"":""op4j\/src\/main\/java\/org\/op4j\/functions at master \u00b7 op4j\/op4j \u00b7 GitHub""}]]",,,Павел (12126225),,,,
+,,,,,,,,
